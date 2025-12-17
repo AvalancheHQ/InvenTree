@@ -1,0 +1,63 @@
+name: CodSpeed
+'on':
+  push:
+    branches:
+    - master
+  pull_request: null
+  workflow_dispatch: null
+env:
+  python_version: 3.11
+  INVENTREE_DB_ENGINE: sqlite3
+  INVENTREE_DB_NAME: inventree_benchmark
+  INVENTREE_DEBUG: false
+  INVENTREE_LOG_LEVEL: WARNING
+  INVENTREE_PLUGINS_ENABLED: false
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - name: Set up Python ${{ env.python_version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.python_version }}
+        cache: pip
+    - name: Install system dependencies
+      run: 'sudo apt-get update
+
+        sudo apt-get install -y gettext poppler-utils
+
+        '
+    - name: Install Python dependencies
+      run: 'python -m pip install --upgrade pip
+
+        pip install uv
+
+        cd src/backend
+
+        uv pip install --system -r requirements.txt
+
+        uv pip install --system pytest pytest-codspeed pytest-django
+
+        '
+    - name: Set up database
+      run: 'cd src/backend/InvenTree
+
+        python manage.py migrate --noinput
+
+        python manage.py loaddata category part location stock
+
+        '
+    - name: Run benchmarks with CodSpeed
+      uses: CodSpeedHQ/action@v4
+      with:
+        upload-url: ${{ secrets.CODSPEED_FRANCOIS_DEV_UPLOAD_URL }}
+        mode: simulation
+        run: pytest src/backend/InvenTree/benchmarks/ --codspeed

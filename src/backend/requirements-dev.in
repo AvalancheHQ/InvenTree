@@ -14,3 +14,6 @@ ty                                      # type checking
 django-types                            # typing
 django-stubs                            # typing
 requests-mock                           # Mock requests for unit tests
+pytest                                  # Testing framework
+pytest-codspeed                         # Performance benchmarking with CodSpeed
+pytest-django                           # Django integration for pytest
