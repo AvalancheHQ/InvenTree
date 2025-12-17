@@ -8,6 +8,7 @@ django-test-migrations                  # Unit testing for database migrations
 isort                                   # python import sorting
 pip-tools                               # Compile pip requirements
 pre-commit                              # Git pre-commit
+pytest-codspeed                         # Performance benchmarking with CodSpeed
 setuptools                              # Standard dependency
 pdfminer.six                            # PDF validation
 ty                                      # type checking
